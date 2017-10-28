@@ -1,0 +1,65 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    name: {name}
+  name: {name}
+spec:
+  revisionHistoryLimit: 0
+  template:
+    metadata:
+      annotations:
+        chaos.alpha.kubernetes.io/enabled: "true"
+      labels:
+        name: {name}
+    spec:
+      containers:
+      - name: {name}
+        image: vizzuality/{name}
+        imagePullPolicy: Always
+        resources:
+          requests:
+            memory: "0Mi"
+            cpu: "0m"
+        args:
+          - start
+        env:
+          - name: PORT
+            value: "62000"
+          - name: ENVIRONMENT
+            value: staging
+          - name: LOCAL_URL
+            value: http://{name}.default.svc.cluster.local:62000
+          - name: CT_URL
+            valueFrom:
+                secretKeyRef:
+                  name: mssecrets
+                  key: CT_URL
+          - name: CT_TOKEN
+            valueFrom:
+                secretKeyRef:
+                  name: mssecrets
+                  key: CT_TOKEN
+          - name: CT_REGISTER_MODE
+            valueFrom:
+                secretKeyRef:
+                  name: mssecrets
+                  key: CT_REGISTER_MODE
+          - name: API_VERSION
+            valueFrom:
+                secretKeyRef:
+                  name: mssecrets
+                  key: API_VERSION
+          - name: TERRAI_INDEX_ID
+            value: index_2ee5754329a848309826d030c02434ce
+          - name: TERRAI_DATASET_ID
+            value: 2ee57543-29a8-4830-9826-d030c02434ce
+          - name: GLAD_INDEX_ID
+            value: index_a228c22ce99a4df3b627a1825e7176f2
+          - name: GLAD_DATASET_ID
+            value: a228c22c-e99a-4df3-b627-a1825e7176f2
+
+        ports:
+          - containerPort: 62000
+
+      restartPolicy: Always
